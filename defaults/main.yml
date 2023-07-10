@@ -8,6 +8,8 @@ etcd_ca_conf_directory: "{{ '~/etcd-certificates' | expanduser }}"
 
 # etcd Ansible group
 etcd_ansible_group: "k8s_etcd"
+# etcd IP version
+etcd_ip_family: ipv4
 # etcd version
 etcd_version: "3.5.8"
 # Port where etcd listening for clients
