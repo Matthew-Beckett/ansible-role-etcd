@@ -3,9 +3,9 @@
 {%- macro cluster_hosts() -%}
 {%- for host in groups[etcd_ansible_group] -%}
 {% if etcd_ip_family == 'ipv4' %}
-    {{ hostvars[host]["ansible_" + etcd_interface].ipv4[0].address }}
+    {{ hostvars[host]["ansible_facts"]["ansible_" + etcd_interface].ipv4[0].address }}
 {% elseif etcd_ip_family == 'ipv6' %}
-    {{ hostvars[host]["ansible_" + etcd_interface].ipv6[0].address }}
+    {{ hostvars[host]["ansible_facts"]["ansible_" + etcd_interface].ipv6[0].address }}
 {% endif %}
 {%- endfor -%}
 {%- endmacro -%}
