@@ -2,10 +2,10 @@
 {%- if not etcd_settings['discovery-srv'] %}
 {%- macro cluster_hosts() -%}
 {%- for host in groups[etcd_ansible_group] -%}
-{% if hostvars[host]['ansible_' + etcd_interface].ipv4[0].address is defined %}
-    {{ hostvars[host]['ansible_' + etcd_interface].ipv4[0].address }}
-{% else %}
-    {{ hostvars[host]['ansible_' + etcd_interface].ipv6[0].address }}
+{% if hostvars[host]["ansible_" + etcd_interface].ipv4[0].address is defined %}
+    {{ hostvars[host]["ansible_" + etcd_interface].ipv4[0].address }}
+{% elseif hostvars[host]["ansible_" + etcd_interface].ipv6[0].address is defined %}
+    {{ hostvars[host]["ansible_" + etcd_interface].ipv6[0].address }}
 {% endif %}
 {%- endfor -%}
 {%- endmacro -%}
