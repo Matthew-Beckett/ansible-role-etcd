@@ -6,14 +6,14 @@
   {%- if interface is not none %}
     {%- if interface.ipv4 is defined and interface.ipv6 is defined %}
       {%- if etcd_ip_family == 'ipv4' %}
-        {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv4[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
+        {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv4[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
       {%- else %}
-        {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv6[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
+        {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv6[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
       {%- endif %}
     {%- elif interface.ipv4 is defined %}
-      {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv4[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
+      {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv4[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
     {%- elif interface.ipv6 is defined %}
-      {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv6[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
+      {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv6[0].address + ':' + etcd_peer_port | ansible.utils.ipwrap | quote }}{% if not loop.last %},{% endif %}
     {%- endif %}
   {%- endif %}
 {%- endfor -%} 
