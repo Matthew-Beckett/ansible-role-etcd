@@ -2,19 +2,18 @@
 {%- if not etcd_settings['discovery-srv'] %}
 {%- macro cluster_hosts() -%}
 {%- for host in groups[etcd_ansible_group] -%}
-  {%- if hostvars[host]["ansible_" + etcd_interface] is defined %}
-    {%- set interface = hostvars[host]["ansible_" + etcd_interface] %}
+  {%- set interface = hostvars[host]["ansible_" + etcd_interface] if hostvars[host]["ansible_" + etcd_interface] is defined else None %}
+  {%- if interface is not none %}
     {%- if interface.ipv4 is defined and interface.ipv6 is defined %}
       {%- if etcd_ip_family == 'ipv4' %}
-        {{hostvars[host]['ansible_hostname']}}=https://{{hostvars[host]['ansible_' + etcd_interface].ipv4.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
+        {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv4.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
       {%- else %}
-        {{hostvars[host]['ansible_hostname']}}=https://{{hostvars[host]['ansible_' + etcd_interface].ipv6.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
+        {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv6.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
       {%- endif %}
-    {%- endif %}
-    {%- if interface.ipv4 is defined %}
-      {{hostvars[host]['ansible_hostname']}}=https://{{hostvars[host]['ansible_' + etcd_interface].ipv4.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
+    {%- elif interface.ipv4 is defined %}
+      {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv4.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
     {%- elif interface.ipv6 is defined %}
-      {{hostvars[host]['ansible_hostname']}}=https://{{hostvars[host]['ansible_' + etcd_interface].ipv6.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
+      {{hostvars[host]['ansible_hostname']}}=https://{{interface.ipv6.address}}:{{etcd_peer_port}}{% if not loop.last %},{% endif %}
     {%- endif %}
   {%- endif %}
 {%- endfor -%} 
