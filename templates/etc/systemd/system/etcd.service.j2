@@ -2,15 +2,24 @@
 {%- if not etcd_settings['discovery-srv'] %}
 {%- macro cluster_hosts() -%}
 {%- for host in groups[etcd_ansible_group] -%}
-{% if etcd_ip_family == 'ipv4' %}
-    {{ hostvars[host]["ansible_facts"]["ansible_" + etcd_interface].ipv4[0].address }}
-{% elseif etcd_ip_family == 'ipv6' %}
-    {{ hostvars[host]["ansible_facts"]["ansible_" + etcd_interface].ipv6[0].address }}
-{% endif %}
+  {%- if hostvars[host]["ansible_" + etcd_interface] is defined %}
+    {%- set interface = hostvars[host]["ansible_" + etcd_interface] %}
+    {%- if interface.ipv4 is defined and interface.ipv6 is defined %}
+      {%- if etcd_ip_family == 'ipv4' %}
+        {{ interface.ipv4[0].address }}
+      {%- elif etcd_ip_family == 'ipv6' %}
+        {{ interface.ipv6[0].address }}
+      {%- endif %}
+    {%- elif interface.ipv4 is defined %}
+      {{ interface.ipv4[0].address }}
+    {%- elif interface.ipv6 is defined %}
+      {{ interface.ipv6[0].address }}
+    {%- endif %}
+  {%- endif %}
 {%- endfor -%}
 {%- endmacro -%}
-{%- set x=etcd_settings.__setitem__('initial-cluster',cluster_hosts()) -%}
-{%- set x=etcd_settings.__delitem__('discovery-srv') -%}
+{%- set x = etcd_settings.__setitem__('initial-cluster', cluster_hosts()) -%}
+{%- set x = etcd_settings.__delitem__('discovery-srv') -%}
 {%- endif %}
 [Unit]
 Description=etcd
@@ -18,11 +27,11 @@ Documentation=https://github.com/etcd-io/etcd/
 
 [Service]
 {% if etcd_allow_unsupported_archs %}
-Environment=ETCD_UNSUPPORTED_ARCH={{etcd_architecture}}
+Environment=ETCD_UNSUPPORTED_ARCH={{ etcd_architecture }}
 {% endif %}
-ExecStart={{etcd_bin_dir}}/etcd \
+ExecStart={{ etcd_bin_dir }}/etcd \
 {%- for setting in etcd_settings|sort %}
-  --{{setting}}="{{etcd_settings[setting]}}" {% if not loop.last %}\{% endif %}
+  --{{ setting }}="{{ etcd_settings[setting] }}"{% if not loop.last %}\{% endif %}
 {%- endfor %}
 Restart=on-failure
 RestartSec=5
