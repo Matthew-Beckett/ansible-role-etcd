@@ -2,18 +2,18 @@
 {%- if not etcd_settings['discovery-srv'] %}
 {%- macro cluster_hosts() -%}
 {%- for host in groups[etcd_ansible_group] -%}
-  {%- if hostvars[host]["ansible_" + etcd_interface] is defined %}
-    {%- set interface = hostvars[host]["ansible_" + etcd_interface] %}
+  {%- if hostvars[host]["ansible_facts"]["ansible_" + etcd_interface] is defined %}
+    {%- set interface = hostvars[host]["ansible_facts"]["ansible_" + etcd_interface] %}
     {%- if interface.ipv4 is defined and interface.ipv6 is defined %}
       {%- if etcd_ip_family == 'ipv4' %}
         {%- set ip_address = interface.ipv4[0].address %}
       {%- else %}
-        {%- set ip_address = interface.ipv6[0].address %}
+        {%- set ip_address = interface.ipv6[0].address | ansible.utils.ipwrap | quote %}
       {%- endif %}
     {%- elif interface.ipv4 is defined %}
       {%- set ip_address = interface.ipv4[0].address %}
     {%- elif interface.ipv6 is defined %}
-      {%- set ip_address = interface.ipv6[0].address %}
+      {%- set ip_address = interface.ipv6[0].address | ansible.utils.ipwrap | quote %}
     {%- endif %}
     {{ ip_address }}
   {%- endif %}
