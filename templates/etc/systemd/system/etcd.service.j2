@@ -6,15 +6,16 @@
     {%- set interface = hostvars[host]["ansible_" + etcd_interface] %}
     {%- if interface.ipv4 is defined and interface.ipv6 is defined %}
       {%- if etcd_ip_family == 'ipv4' %}
-        {{ interface.ipv4[0].address }}
-      {%- elif etcd_ip_family == 'ipv6' %}
-        {{ interface.ipv6[0].address }}
+        {%- set ip_address = interface.ipv4[0].address %}
+      {%- else %}
+        {%- set ip_address = interface.ipv6[0].address %}
       {%- endif %}
     {%- elif interface.ipv4 is defined %}
-      {{ interface.ipv4[0].address }}
+      {%- set ip_address = interface.ipv4[0].address %}
     {%- elif interface.ipv6 is defined %}
-      {{ interface.ipv6[0].address }}
+      {%- set ip_address = interface.ipv6[0].address %}
     {%- endif %}
+    {{ ip_address }}
   {%- endif %}
 {%- endfor -%}
 {%- endmacro -%}
