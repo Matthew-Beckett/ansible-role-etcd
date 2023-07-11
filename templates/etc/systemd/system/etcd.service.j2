@@ -6,14 +6,14 @@
   {%- if interface is not none %}
     {%- if interface.ipv4 is defined and interface.ipv6 is defined %}
       {%- if etcd_ip_family == 'ipv4' %}
-        {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv4[0].address | ansible.utils.ipwrap + ':' + etcd_peer_port | quote }}{% if not loop.last %},{% endif %}
+        {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv4[0].address | ansible.utils.ipwrap + ':' + etcd_peer_port }}{% if not loop.last %},{% endif %}
       {%- else %}
-        {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv6[0].address | ansible.utils.ipwrap + ':' + etcd_peer_port | quote }}{% if not loop.last %},{% endif %}
+        {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv6[0].address | ansible.utils.ipwrap + ':' + etcd_peer_port }}{% if not loop.last %},{% endif %}
       {%- endif %}
     {%- elif interface.ipv4 is defined %}
-      {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv4[0].address + ':' + etcd_peer_port | quote }}{% if not loop.last %},{% endif %}
+      {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv4[0].address + ':' + etcd_peer_port }}{% if not loop.last %},{% endif %}
     {%- elif interface.ipv6 is defined %}
-      {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv6[0].address | ansible.utils.ipwrap + ':' + etcd_peer_port | quote }}{% if not loop.last %},{% endif %}
+      {{hostvars[host]['ansible_hostname']}}={{ 'https://' + interface.ipv6[0].address | ansible.utils.ipwrap + ':' + etcd_peer_port }}{% if not loop.last %},{% endif %}
     {%- endif %}
   {%- endif %}
 {%- endfor -%} 
@@ -30,9 +30,11 @@ Documentation=https://github.com/etcd-io/etcd/
 Environment=ETCD_UNSUPPORTED_ARCH={{etcd_architecture}}
 {% endif %}
 ExecStart={{etcd_bin_dir}}/etcd \
-{%- for setting in etcd_settings|sort %}
-  --{{setting}}="{{etcd_settings[setting]}}" {% if not loop.last %}\{% endif %}
-{%- endfor %}
+  --advertise-client-urls="{{ etcd_settings['advertise-client-urls'] }}" \
+  --initial-advertise-peer-urls="{{ etcd_settings['initial-advertise-peer-urls'] }}" \
+  --initial-cluster="{{ etcd_settings['initial-cluster'] }}" \
+  --listen-client-urls="{{ etcd_settings['listen-client-urls'] }}" \
+  --listen-peer-urls="{{ etcd_settings['listen-peer-urls'] }}" \
 Restart=on-failure
 RestartSec=5
 Type=notify
